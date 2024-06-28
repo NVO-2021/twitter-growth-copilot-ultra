@@ -1,62 +1,120 @@
 // content.js
-console.debug('twitter-growth-copilot bootstrap loaded!!!')
-console.debug('content.script!!!')
-import { createApp } from 'vue'
+import { createApp, onMounted } from 'vue'
+import ElementPlus from 'element-plus'
 import { TwitterSelectors } from '/src/utils/twitterSelectors'
+
+
+//page
+import TwitterUltra from './component/TwitterUltra.vue'
+import ProfileCardUltra from './component/ProfileCardUltra.vue'
+
+//js
 import { checkUsername, getAndObserveElement, getElement } from '/src/utils/twitterUtils.js'
 
-import TwitterUltra from './component/TwitterUltra.vue'
-import ProfileCard from './component/ProfileCard.vue'
+// css
+import 'element-plus/dist/index.css'
 
-initVueApp()
-observeCreateProfileCard()
+
+//code start
+console.log('twitter-growth-copilot bootstrap loaded!!!')
+console.log('content.script!!!')
+
+
+createObserver(() => {
+    return document.getElementById('vue-content-container')
+  },
+  () => {
+    initVueApp()
+  })
+
+createObserver(() => {
+    return document.getElementById('inject-profile-card')
+  },
+  () => {
+    onProfileChanged()
+  })
+
+function createObserver(condition, callback) {
+  const intervalId = setInterval(function() {
+    // 检查条件是否满足，这里假设条件为某个变量或者函数返回值
+    if (condition()) {
+      console.log('条件已满足，清除定时器')
+      clearInterval(intervalId) // 清除定时器
+    } else {
+      console.log('继续轮询...')
+      callback()
+    }
+  }, 500)
+}
+
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'urlChanged') {
+    console.log('URL changed to:', message.url)
+
+    // 在此处理 URL 变化的逻辑
+    // 例如：显示通知、修改页面内容等
+    onProfileChanged()
+
+    sendResponse({ status: 'URL change processed' })
+  }
+})
 
 
 function initVueApp() {
 
   // Vue.js 已加载，可以初始化Vue应用
+  const _id = 'vue-content-container'
+  if (document.getElementById(_id)) {
+    return
+  }
+
   let appContainer = document.createElement('div')
   appContainer.id = 'vue-content-container'
   document.body.appendChild(appContainer)
-  createApp(TwitterUltra).mount('#vue-content-container')
+  createApp(TwitterUltra)
+    .use(ElementPlus)
+    .mount('#vue-content-container')
 }
 
 
-function observeCreateProfileCard() {
+/*function observeCreateProfileCard() {
   // observeElement(TwitterSelectors.PROFILE_PRIMARY_COLUMN, $profile => {
   getAndObserveElement(TwitterSelectors.TWITTER_TITLE, $profile => {
 
-    console.info('TwitterSelectors.TWITTER_TITLE', $profile)
+    console.log('TwitterSelectors.TWITTER_TITLE', $profile)
 
-    onProfileChanged($profile)
+    // onProfileChanged()
 
   })
-}
+}*/
 
 
-async function onProfileChanged($profile) {
+async function onProfileChanged() {
 
   let _id = 'inject-profile-card'
 
   if (document.getElementById(_id)) {
-    console.debug('profile card already exist')
+    console.log('profile card already exist')
     return
   }
 
-  console.debug('onProfileChanged >>>>>>>>>')
+  console.log('onProfileChanged >>>>>>>>>')
 
   let result = await checkUsername()
-  console.debug('checkUsername()', result)
+  console.log('checkUsername()', result)
   if (result === true) {
     getElement(TwitterSelectors.PROFILE_USER_NAME).then($html => {
-      console.debug(`create _id :: ${_id} starting ...`)
+      console.log(`create _id :: ${_id} starting ...`)
 
       let appContainer = document.createElement('div')
       appContainer.id = _id
       $html.parentElement.appendChild(appContainer)
-      createApp(ProfileCard).mount(`#${_id}`)
+      createApp(ProfileCardUltra)
+        .use(ElementPlus)
+        .mount(`#${_id}`)
 
-      console.debug(`create _id :: ${_id} success!`)
+      console.log(`create _id :: ${_id} success!`)
     })
   }
 

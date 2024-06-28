@@ -1,7 +1,7 @@
 // twitterSelectors.js
 export const TwitterSelectors = {
   TWITTER_TITLE: `title`,
-  USER_AVATAR_CONTAINER: `[data-testid^="UserAvatar-Container"]`,
+  APPTABBAR_PROFILE_LINK: `[data-testid="AppTabBar_Profile_Link"]`,
   PROFILE_USER_NAME: `[data-testid="UserName"]`,
   VERIFIED_FOLLOWERS: `a[href$="/verified_followers"]`,
 }

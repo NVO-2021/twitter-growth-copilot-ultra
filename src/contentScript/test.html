@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Growth Copilot</title>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          margin: 0;
+          background-color: #f0f0f0;
+      }
+      .twitter-growth-copilot {
+          background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+          padding: 1.5rem;
+          border-radius: 1rem;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          max-width: 24rem;
+          color: white;
+      }
+      .title {
+          display: flex;
+          align-items: center;
+          font-size: 1.5rem;
+          font-weight: bold;
+          margin-bottom: 1.5rem;
+      }
+      .title .emoji {
+          margin-right: 0.5rem;
+          font-size: 1.8rem;
+          animation: rocket 2s ease-in-out infinite;
+      }
+      @keyframes rocket {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-5px) rotate(5deg); }
+      }
+      .content {
+          background-color: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(10px);
+          border-radius: 0.5rem;
+          padding: 1.5rem;
+      }
+      .stages {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 2rem;
+      }
+      .stage {
+          text-align: center;
+      }
+      .icon-wrapper {
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          width: 3rem;
+          height: 3rem;
+          border-radius: 50%;
+          margin-bottom: 0.5rem;
+          font-size: 2rem;
+          transition: transform 0.3s ease;
+          cursor: pointer;
+      }
+      .icon-wrapper:hover {
+          animation: bounce 0.6s ease infinite;
+      }
+      @keyframes bounce {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+      }
+      .yellow {
+          background-color: #fde68a;
+          animation: pulse-yellow 2s infinite;
+      }
+      .pink {
+          background-color: #fbcfe8;
+          animation: pulse-pink 2s infinite;
+      }
+      @keyframes pulse-yellow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(253, 230, 138, 0.7); }
+          50% { box-shadow: 0 0 0 10px rgba(253, 230, 138, 0); }
+      }
+      @keyframes pulse-pink {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(251, 207, 232, 0.7); }
+          50% { box-shadow: 0 0 0 10px rgba(251, 207, 232, 0); }
+      }
+      .stage p {
+          margin: 0.5rem 0 0;
+          font-weight: 500;
+      }
+      .progress-wrapper {
+          position: relative;
+          margin-bottom: 1rem;
+      }
+      .progress-label {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+      }
+      .label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          background-color: #10b981;
+          padding: 0.25rem 0.5rem;
+          border-radius: 9999px;
+      }
+      .percentage {
+          font-size: 0.75rem;
+          font-weight: 600;
+      }
+      .progress-bar {
+          height: 0.5rem;
+          background-color: rgba(255, 255, 255, 0.3);
+          border-radius: 9999px;
+          overflow: hidden;
+      }
+      .progress {
+          height: 100%;
+          background-color: #10b981;
+          width: 0;
+          transition: width 0.5s ease-in-out;
+      }
+      .button-container {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 1rem;
+      }
+      .button {
+          display: inline-block;
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 9999px;
+          text-decoration: none;
+          font-weight: bold;
+          transition: background-color 0.3s ease;
+          cursor: pointer;
+      }
+      .share-button {
+          background-color: #1DA1F2;
+      }
+      .share-button:hover {
+          background-color: #1991db;
+      }
+      .download-button {
+          background-color: #10b981;
+      }
+      .download-button:hover {
+          background-color: #059669;
+      }
+  </style>
+</head>
+<body>
+<div class="twitter-growth-copilot" id="copilot">
+  <h2 class="title">
+    <span class="emoji">🚀</span>
+    Twitter Growth Copilot
+  </h2>
+  <div class="content">
+    <div class="stages">
+      <div class="stage">
+        <div class="icon-wrapper yellow">
+          🐣
+        </div>
+        <p>破壳起点</p>
+      </div>
+      <div class="stage">
+        <div class="icon-wrapper pink">
+          🎉
+        </div>
+        <p>初步认识</p>
+      </div>
+    </div>
+    <div class="progress-wrapper">
+      <div class="progress-label">
+        <span class="label">进度</span>
+        <span class="percentage">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+    </div>
+    <div class="button-container">
+      <a href="#" class="button share-button" id="shareButton">分享到 Twitter</a>
+      <a href="#" class="button download-button" id="downloadButton">下载截图</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const progress = document.querySelector('.progress');
+    const percentage = document.querySelector('.percentage');
+    const targetProgress = 99;
+    let currentProgress = 0;
+
+    function updateProgress() {
+      if (currentProgress < targetProgress) {
+        currentProgress++;
+        progress.style.width = currentProgress + '%';
+        percentage.textContent = currentProgress + '%';
+        requestAnimationFrame(updateProgress);
+      }
+    }
+
+    updateProgress();
+
+    function captureScreenshot() {
+      return html2canvas(document.getElementById('copilot'));
+    }
+
+
+
+    document.getElementById('downloadButton').addEventListener('click', function(e) {
+      e.preventDefault();
+      captureScreenshot().then(function(canvas) {
+        const link = document.createElement('a');
+        link.download = 'twitter-growth-copilot.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    });
+  });
+</script>
+</body>
+</html>

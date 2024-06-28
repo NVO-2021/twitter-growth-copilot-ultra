@@ -1,13 +1,11 @@
 import { TwitterSelectors } from './twitterSelectors.js'
 
-export function userFollowersCount(selector) {
+export async function getFollowersCount() {
 
-  // getElement(selector).then($html => {
-  const $html = document.querySelector(selector)
+  const $html = await getElement(TwitterSelectors.VERIFIED_FOLLOWERS)
   const followersText = $html ? $html.innerText : ''
 
   return parseFollowersCount(followersText.replaceAll('Followers| ', ''))
-  // })
 
 
 }
@@ -57,9 +55,9 @@ export function extractFromAvatarButton(str) {
   return match ? match[1] : null
 }
 
-export function extractFromUserAvatarContainer(str) {
+export function extractFromUserProfileUsername(str) {
   // 使用正则表达式匹配 @ 后面的字符直到空格或字符串末尾
-  return (str ?? '').replace('UserAvatar-Container-', '')
+  return (str ?? '').replace('/', '')
 }
 
 /**
@@ -75,9 +73,9 @@ export function extractFromUserAvatarContainer(str) {
 export function observeElement($element, callback, name, options = { childList: true }, log = false) {
   if (name) {
     if (options.childList && callback.length > 0) {
-      console.info(`observing ${name}`, $element)
+      console.debug(`observing ${name}`, $element)
     } else {
-      console.info(`observing ${name}`)
+      console.debug(`observing ${name}`)
     }
   }
 
@@ -162,11 +160,11 @@ export function observeUsername(callback) {
 
     let titleUser = titleUsername($title.innerText)
 
-    getElement(TwitterSelectors.USER_AVATAR_CONTAINER).then($html => {
+    getElement(TwitterSelectors.APPTABBAR_PROFILE_LINK).then($html => {
 
-      let userName = extractFromUserAvatarContainer($html.getAttribute('data-testid'))
+      let userName = extractFromUserProfileUsername($html.getAttribute('href'))
 
-      console.debug('TwitterSelectors.USER_AVATAR_CONTAINER', userName)
+      console.debug('TwitterSelectors.APPTABBAR_PROFILE_LINK', userName)
       console.debug('titleUser', titleUser)
       if (titleUser && userName && titleUser === userName) {
         callback(true)
@@ -187,13 +185,14 @@ export async function checkUsername() {
   let $title = await getElement('title')
   let titleUser = titleUsername($title.innerText)
 
-  let $html = await getElement(TwitterSelectors.USER_AVATAR_CONTAINER)
+  let $html = await getElement(TwitterSelectors.APPTABBAR_PROFILE_LINK)
 
 
-  let userName = extractFromUserAvatarContainer($html.getAttribute('data-testid'))
+  let userName = extractFromUserProfileUsername($html.getAttribute('href'))
 
-  console.info('TwitterSelectors.USER_AVATAR_CONTAINER', userName)
-  console.info('titleUser', titleUser)
+  console.debug('$title', $title?.innerText)
+  console.debug('TwitterSelectors.APPTABBAR_PROFILE_LINK', userName)
+  console.debug('titleUser', titleUser)
 
   return titleUser
     && userName
