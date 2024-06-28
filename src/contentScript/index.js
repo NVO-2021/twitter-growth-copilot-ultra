@@ -1,14 +1,15 @@
 // content.js
-console.log('content.script!!!')
-import { createApp, onMounted } from 'vue'
+console.debug('twitter-growth-copilot bootstrap loaded!!!')
+console.debug('content.script!!!')
+import { createApp } from 'vue'
+import { TwitterSelectors } from '/src/utils/twitterSelectors'
+import { checkUsername, getAndObserveElement, getElement } from '/src/utils/twitterUtils.js'
+
 import TwitterUltra from './component/TwitterUltra.vue'
 import ProfileCard from './component/ProfileCard.vue'
-import { TwitterSelectors } from '/src/utils/twitterSelectors'
-
-
 
 initVueApp()
-observeDomChange()
+observeCreateProfileCard()
 
 
 function initVueApp() {
@@ -21,53 +22,45 @@ function initVueApp() {
 }
 
 
-function injectProfileCard(usernameDom) {
-  if (document.getElementById('profile-card-container')) {
-    console.debug('profile-card-container has existed!', 999)
+function observeCreateProfileCard() {
+  // observeElement(TwitterSelectors.PROFILE_PRIMARY_COLUMN, $profile => {
+  getAndObserveElement(TwitterSelectors.TWITTER_TITLE, $profile => {
+
+    console.info('TwitterSelectors.TWITTER_TITLE', $profile)
+
+    onProfileChanged($profile)
+
+  })
+}
+
+
+async function onProfileChanged($profile) {
+
+  let _id = 'inject-profile-card'
+
+  if (document.getElementById(_id)) {
+    console.debug('profile card already exist')
     return
   }
 
-  let profileCardContainer = document.createElement('div')
-  profileCardContainer.id = 'profile-card-container'
-  console.debug(usernameDom, 'usernameDom')
-  usernameDom.append(profileCardContainer)
-  createApp(ProfileCard).mount('#profile-card-container')
-}
+  console.debug('onProfileChanged >>>>>>>>>')
 
-/************ observer *************/
+  let result = await checkUsername()
+  console.debug('checkUsername()', result)
+  if (result === true) {
+    getElement(TwitterSelectors.PROFILE_USER_NAME).then($html => {
+      console.debug(`create _id :: ${_id} starting ...`)
 
+      let appContainer = document.createElement('div')
+      appContainer.id = _id
+      $html.parentElement.appendChild(appContainer)
+      createApp(ProfileCard).mount(`#${_id}`)
 
-function observeDomChange() {
-
-// 使用MutationObserver监测DOM变化
-  const observer = new MutationObserver((mutations) => {
-
-    for (const mutation of mutations) {
-      let target = mutation.target
-      if (mutation.type === 'childList' && target) {
-
-        console.debug('observer.target...')
-
-        // 检查是否加载了新的UserName元素
-        let usernameDom = target.querySelector(TwitterSelectors.SideNav_AccountSwitcher_Button)
-        if (usernameDom) {
-          console.debug('UserName元素已加载：', target)
-          injectProfileCard(usernameDom)
-        }
-      }
-    }
-  })
-
-// 配置MutationObserver监测选项
-  const config = {
-    childList: true, // 监测直接子节点的变化
-    subtree: true,    // 监测整个子树的变化
+      console.debug(`create _id :: ${_id} success!`)
+    })
   }
 
 
-// 开始监测
-  observer.observe(document, config)
 }
-
 
 

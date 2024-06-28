@@ -1,26 +1,16 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import confetti from 'canvas-confetti'
-import { TwitterSelectors } from '/src/utils/twitterSelectors'
-import { twitterEvents } from '/src/utils/twitterEvents'
-import {
-  isUrlPathMatching,
-  getElement,
-  getAndObserveElement,
-  extractFromAvatarButton,
-  titleUsername,
-} from '/src/utils/twitterUtils'
+
+import { observeUsername } from '/src/utils/twitterUtils'
 
 console.debug('TwitterUltra.vue is running', '[Vue]')
 
 
-let curTitleUser = ''
+let currentUserFlag = false
 
 
 /************************************************/
-
-/************************************************/
-
 function doAnimation() {
   async function confettiAnimationAsync(endTime) {
     const confettiFrame = async () => {
@@ -51,52 +41,34 @@ function doAnimation() {
 
 // 调用异步动画函数，传入结束时间
   confettiAnimationAsync(Date.now() + 1 * 1000)
-    .then(() => console.log('Confetti animation ended.', '[TwitterUltra]'))
+    .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
 
   setTimeout(() => {
     // 调用异步动画函数，传入结束时间
     confettiAnimationAsync(Date.now() + 1 * 1000)
-      .then(() => console.log('Confetti animation ended.', '[TwitterUltra]'))
-  },3000)
+      .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
+  }, 3000)
 
 }
 
+/************************************************/
 
-function onTitleChanged($title) {
 
-  let titleUser = titleUsername($title.innerText)
-
-  if (curTitleUser !== titleUser) {
-
-    curTitleUser = titleUser
-    getElement(TwitterSelectors.SideNav_AccountSwitcher_Button).then($html => {
-
-      let userName = extractFromAvatarButton($html.innerText)
-
-      console.debug('SideNav_AccountSwitcher_Button', userName)
-
-      // let curUserProfile = isUrlPathMatching(`^/${userName}$`)
-
-      if (titleUser && userName && titleUser === userName) {
-        console.log('play animation', '[TwitterUltra]')
-        doAnimation()
-      }
-    })
-
-  }
+function onTitleChanged() {
+  observeUsername((flag) => {
+    if (!currentUserFlag && flag === true) {
+      console.log("observeUsername",flag)
+      currentUserFlag = true
+      doAnimation()
+    }
+  })
 
 
 }
 
 
 onMounted(() => {
-
-  getAndObserveElement(`title`, ($title) => {
-
-    console.debug('getAndObserveElement', $title)
-    onTitleChanged($title)
-
-  })
+  onTitleChanged()
 
 
 })

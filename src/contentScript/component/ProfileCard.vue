@@ -1,7 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { userFollowersCount } from '/src/utils/twitterUtils'
-import {TwitterSelectors} from '/src/utils/twitterSelectors'
+import { onMounted } from 'vue'
 
 console.debug('ProfileCard.vue is running', '[Vue]')
 
@@ -14,8 +12,14 @@ onMounted(() => {
 
 <template>
 
+
+  <div>
+    <button class="btn btn-primary">Button</button>
+  </div>
+
 </template>
 
 <style scoped>
+
 
 </style>

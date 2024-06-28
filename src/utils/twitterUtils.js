@@ -1,3 +1,5 @@
+import { TwitterSelectors } from './twitterSelectors.js'
+
 export function userFollowersCount(selector) {
 
   // getElement(selector).then($html => {
@@ -33,7 +35,7 @@ export function isUrlPathMatching(pattern) {
   // 获取当前浏览器的URL路径
   const urlPath = window.location.pathname
 
-  console.debug(urlPath,"urlPath")
+  console.debug(urlPath, 'urlPath')
 
   // 创建正则表达式对象
   const regex = new RegExp(pattern)
@@ -43,16 +45,21 @@ export function isUrlPathMatching(pattern) {
 }
 
 export function titleUsername(inputString) {
-  const regex = /\(@(\w+)\)/;
-  const match = inputString.match(regex);
-  return match ? match[1] : null;
+  const regex = /\(@(\w+)\)/
+  const match = inputString.match(regex)
+  return match ? match[1] : null
 }
 
 export function extractFromAvatarButton(str) {
   // 使用正则表达式匹配 @ 后面的字符直到空格或字符串末尾
-  const regex = /@(\w+)/;
-  const match = str.match(regex);
-  return match ? match[1] : null;
+  const regex = /@(\w+)/
+  const match = str.match(regex)
+  return match ? match[1] : null
+}
+
+export function extractFromUserAvatarContainer(str) {
+  // 使用正则表达式匹配 @ 后面的字符直到空格或字符串末尾
+  return (str ?? '').replace('UserAvatar-Container-', '')
 }
 
 /**
@@ -65,12 +72,12 @@ export function extractFromAvatarButton(str) {
  * @param {MutationObserverInit} options
  * @return {import('./types').NamedMutationObserver}
  */
-export function observeElement($element, callback, name, options = { childList: true }) {
+export function observeElement($element, callback, name, options = { childList: true }, log = false) {
   if (name) {
     if (options.childList && callback.length > 0) {
-      console.debug(`observing ${name}`, $element)
+      console.info(`observing ${name}`, $element)
     } else {
-      console.debug(`observing ${name}`)
+      console.info(`observing ${name}`)
     }
   }
 
@@ -135,12 +142,62 @@ export function getElement(selector, {
 }
 
 
-export async function getAndObserveElement(selector,callback) {
-  let $element = await getElement(selector, { name: '<title>' })
-  observeElement($element, () => {
-    callback($element)
-  }, '<title>')
+export async function getAndObserveElement(selector, callback) {
+  let $element = await getElement(selector,
+    { name: `${selector}` })
+  observeElement($element, (records) => {
+
+    console.debug(selector, records)
+
+    if (callback) {
+      callback($element)
+    }
+  }, `${selector}`)
 }
 
 
+export function observeUsername(callback) {
 
+  getAndObserveElement('title', $title => {
+
+    let titleUser = titleUsername($title.innerText)
+
+    getElement(TwitterSelectors.USER_AVATAR_CONTAINER).then($html => {
+
+      let userName = extractFromUserAvatarContainer($html.getAttribute('data-testid'))
+
+      console.debug('TwitterSelectors.USER_AVATAR_CONTAINER', userName)
+      console.debug('titleUser', titleUser)
+      if (titleUser && userName && titleUser === userName) {
+        callback(true)
+      }
+      {
+        callback(false)
+      }
+    })
+
+  })
+
+
+}
+
+
+export async function checkUsername() {
+
+  let $title = await getElement('title')
+  let titleUser = titleUsername($title.innerText)
+
+  let $html = await getElement(TwitterSelectors.USER_AVATAR_CONTAINER)
+
+
+  let userName = extractFromUserAvatarContainer($html.getAttribute('data-testid'))
+
+  console.info('TwitterSelectors.USER_AVATAR_CONTAINER', userName)
+  console.info('titleUser', titleUser)
+
+  return titleUser
+    && userName
+    && titleUser === userName
+
+
+}
