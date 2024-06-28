@@ -8,6 +8,11 @@ export default defineConfig(({ mode }) => {
   const production = mode === 'production'
 
   return {
+/*    resolve: {
+      alias: {
+        '@/': `/src/`,
+      },
+    },*/
     build: {
       emptyOutDir: true,
       outDir: 'build',
@@ -20,3 +25,4 @@ export default defineConfig(({ mode }) => {
     plugins: [crx({ manifest }), vue()],
   }
 })
+
