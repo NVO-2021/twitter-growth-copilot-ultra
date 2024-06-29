@@ -5,8 +5,11 @@ export async function getFollowersCount() {
   const $html = await getElement(TwitterSelectors.VERIFIED_FOLLOWERS)
   const followersText = $html ? $html.innerText : ''
 
-  return parseFollowersCount(followersText.replaceAll('Followers| ', ''))
+  let parseFollowers = parseFollowersCount(followersText.replaceAll(/Followers| /g, ''))
 
+  console.debug('parseFollowers', parseFollowers)
+
+  return parseFollowers
 
 }
 
@@ -26,7 +29,12 @@ export function parseFollowersCount(followers) {
     followers = followers.slice(0, -1)
   }
 
-  return parseFloat(followers) * multiplier
+
+  let number = parseFloat(followers) * multiplier
+  console.debug('number', number)
+  console.debug('followers', followers)
+  console.debug('multiplier', multiplier)
+  return number
 }
 
 export function isUrlPathMatching(pattern) {
@@ -154,49 +162,27 @@ export async function getAndObserveElement(selector, callback) {
 }
 
 
-export function observeUsername(callback) {
+export async function observeUsername(callback) {
 
-  getAndObserveElement('title', $title => {
+  let interval = setInterval(async () => {
 
-    let titleUser = titleUsername($title.innerText)
+    let flag = await checkUsername()
 
-    getElement(TwitterSelectors.APPTABBAR_PROFILE_LINK).then($html => {
+    callback(flag)
 
-      let userName = extractFromUserProfileUsername($html.getAttribute('href'))
-
-      console.debug('TwitterSelectors.APPTABBAR_PROFILE_LINK', userName)
-      console.debug('titleUser', titleUser)
-      if (titleUser && userName && titleUser === userName) {
-        callback(true)
-      }
-      {
-        callback(false)
-      }
-    })
-
-  })
-
+  }, 500)
 
 }
 
 
 export async function checkUsername() {
 
-  let $title = await getElement('title')
-  let titleUser = titleUsername($title.innerText)
+  let pathname = window.location.pathname
 
-  let $html = await getElement(TwitterSelectors.APPTABBAR_PROFILE_LINK)
+  let $link = await getElement(TwitterSelectors.APPTABBAR_PROFILE_LINK)
 
-
-  let userName = extractFromUserProfileUsername($html.getAttribute('href'))
-
-  console.debug('$title', $title?.innerText)
-  console.debug('TwitterSelectors.APPTABBAR_PROFILE_LINK', userName)
-  console.debug('titleUser', titleUser)
-
-  return titleUser
-    && userName
-    && titleUser === userName
+  let userName = extractFromUserProfileUsername($link.getAttribute('href'))
+  return pathname.startsWith(`/${userName}`)
 
 
 }

@@ -1,27 +1,34 @@
 <script setup>
 //third party
-import { ElMessage } from 'element-plus'
-import html2canvas from 'html2canvas'
-import { onMounted, ref } from 'vue'
-import { InfoFilled } from '@element-plus/icons-vue'
+import { computed, onMounted, ref } from 'vue'
 
 //custom
-import { observeUsername, getFollowersCount } from '../../utils/twitterUtils'
+import { getFollowersCount, observeUsername } from '../../utils/twitterUtils'
 import confetti from 'canvas-confetti'
-import { getAchievementInfo, getAchievementByLevelStep } from '/src/utils/achievement'
+import { getAchievementInfo } from '/src/utils/achievement'
 
 console.debug('ProfileCardUltra.vue is running', '[Vue]')
 
 
 const captureArea = ref(null)
 const screenshot = ref(null)
+let followsCountCache = 0
+let currentNumber = 0
 
-const activeNames = ref(['copilot']) // 设置默认展开的项
 
 const copilot = ref({
   name: '🚀 Twitter Growth Booster',
   icon: 'el-icon-s-operation',
-  process: 0,
+})
+
+const process = computed(() => {
+  let nextStepFollowers = achievement.value.nextStepInfo?.followers ?? 99999999
+  let percentage = (100 * followsCountCache / nextStepFollowers).toFixed(2)
+  return percentage
+})
+
+const targetFollowers = computed(() => {
+  return achievement.value.nextStepInfo?.followers?.toLocaleString()
 })
 
 
@@ -35,60 +42,9 @@ const achievement = ref({
 })
 
 
-const capture = () => {
-  /* if (captureArea.value) {
-     html2canvas(captureArea.value).then(canvas => {
-       screenshot.value = canvas.toDataURL('image/png')
-       const link = document.createElement('a')
-       link.download = `twitter-growth-booster-${Date.now()}.png`
-       link.href = canvas.toDataURL('image/png')
-       link.click();
-       // copyToClipboard(canvas)
-     })
-   }*/
+const observeChanged = async () => {
 
-  chrome.runtime.sendMessage({ action: 'capture' }, (response) => {
-    if (response.success) {
-      // 处理截取到的图片
-      console.debug(response.dataUrl)
-      // 可以将截图显示在新的标签页中
-      chrome.tabs.create({ url: response.dataUrl })
-    } else {
-      console.error('Error capturing screenshot:', response.error)
-    }
-  })
-
-}
-
-const canvasToBlob = (canvas) => {
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      resolve(blob)
-    }, 'image/png')
-  })
-}
-
-const copyToClipboard = async (canvas) => {
-  if (screenshot.value) {
-    const blob = await canvasToBlob(canvas)
-    const item = new ClipboardItem({ 'image/png': blob })
-    navigator.clipboard.write([item]).then(() => {
-      ElMessage({
-        message: 'Screenshot captured successfully and copied to the clipboard. \nPlease paste it into the Twitter input box right away to share the joy!',
-        type: 'success',
-      })
-    }, (error) => {
-      console.debug('复制失败: ', error)
-    })
-  } else {
-    console.debug('请先捕获截图')
-  }
-}
-
-
-function onTitleChanged() {
-
-  observeUsername((flag) => {
+  await observeUsername((flag) => {
     if (flag === true) {
       console.debug('observeUsername', flag)
 
@@ -101,26 +57,39 @@ function onTitleChanged() {
 }
 
 
-async function freshData(callback) {
+const freshData = async (callback) => {
+
 
   let followersCount = await getFollowersCount()
+
   console.debug('getFollowersCount >>>>>>> ', followersCount)
 
-  let { currentLevel, currentStep, nextLevel, nextStep } = getAchievementInfo(followersCount)
+  if (!followersCount || followersCount === followsCountCache) {
+    console.debug('freshData >>>>>>> ', 'return')
+    return
+  }
+
+
+  followsCountCache = followersCount
+
+
+  let { currentLevel, currentStep, nextLevel, nextStep } = getAchievementInfo(followsCountCache)
 
   console.debug('getAchievementInfo >>>>>>> ', { currentLevel, currentStep, nextLevel, nextStep })
 
-  achievement.value = {
-    currentLevelInfo: currentLevel,
-    nextLevelInfo: nextLevel,
-    currentStepInfo: currentStep,
-    nextStepInfo: nextStep,
-  }
+  achievement.value.currentLevelInfo = currentLevel
+  achievement.value.nextLevelInfo = nextLevel
+  achievement.value.currentStepInfo = currentStep
+  achievement.value.nextStepInfo = nextStep
 
-  copilot.value.process = Number(followersCount / achievement.value.nextStepInfo.followers) * 100
-  console.debug('copilot.value.process >>>>>>> ', copilot.value.process)
+  let _process = process.value
 
-  processShow(copilot.value.process)
+  console.log('current.process >>>>>>> ', _process)
+  console.debug('current.followsCountCache >>>>>>> ', followsCountCache)
+  console.debug('current.achievement >>>>>>> ', achievement)
+
+  processShow(_process)
+  updateNumber(followsCountCache)
 
   // 调用函数执行操作
   updateAchievementStorage().then(changed => {
@@ -141,7 +110,36 @@ async function freshData(callback) {
 
 }
 
-function processShow(targetProgress) {
+const updateNumber = targetNumber => {
+
+  let step = Number(targetNumber / 100) < 1 ? 1 : Number(targetNumber / 100)
+  currentNumber = achievement.value.currentStepInfo?.followers ?? -100
+
+
+  console.debug('currentNumber', currentNumber)
+  console.debug('targetNumber', targetNumber)
+  console.debug('[updateNumber] achievement.value.currentStepInfo >>>>>>>>>>>>> ', achievement.value.currentStepInfo)
+
+  const startNumber = document.getElementById('startNumber')
+  console.debug('startNumber', startNumber)
+
+  function animateNumber() {
+    if (currentNumber < targetNumber) {
+
+      currentNumber = Math.max(currentNumber += step, targetNumber)
+
+      startNumber.textContent = currentNumber?.toLocaleString()
+      requestAnimationFrame(animateNumber)
+    } else if (currentNumber === targetNumber) {
+      startNumber.classList.add('animate-number')
+    }
+  }
+
+  animateNumber()
+
+}
+
+const processShow = (targetProgress) => {
 
   const progress = document.querySelector('.progress')
   const percentage = document.querySelector('.percentage')
@@ -154,7 +152,8 @@ function processShow(targetProgress) {
       return
     }
     if (currentProgress < targetProgress) {
-      currentProgress++
+      currentProgress = Math.min(++currentProgress, targetProgress)
+
       progress.style.width = currentProgress + '%'
       percentage.textContent = currentProgress + '%'
       requestAnimationFrame(updateProgress)
@@ -165,9 +164,9 @@ function processShow(targetProgress) {
 }
 
 // 使用async/await获取存储的成就数据
-async function updateAchievementStorage() {
+const updateAchievementStorage = async () => {
 
-  console.debug('[achievement] >>>>>>> ', achievement.value)
+  console.debug('[updateAchievementStorage] achievement >>>>>>> ', achievement.value)
 
   const result = await chrome.storage.sync.get(['achievement'])
 
@@ -198,7 +197,7 @@ async function updateAchievementStorage() {
 }
 
 
-function showCurrentAchievement() {
+const showCurrentAchievement = () => {
 
   //撒花🎉
   doAnimation()
@@ -209,7 +208,7 @@ function showCurrentAchievement() {
 }
 
 
-function doAnimation() {
+const doAnimation = () => {
   async function confettiAnimationAsync(endTime) {
     const confettiFrame = async () => {
       if (Date.now() > endTime) {
@@ -248,14 +247,14 @@ function doAnimation() {
   }, 3000)
 }
 
-function showBadge() {
+const showBadge = () => {
 
 }
 
 
 onMounted(async () => {
   // await chrome.storage.sync.set({ achievement: null })
-  onTitleChanged()
+  await observeChanged()
 })
 
 </script>
@@ -273,12 +272,14 @@ onMounted(async () => {
             <div class="icon-wrapper yellow">
               {{ achievement?.currentStepInfo?.emoji }}
             </div>
+            <div class="number" id="startNumber">0</div>
             <p>{{ achievement?.currentStepInfo?.reward?.en }}</p>
           </div>
           <div class="stage">
             <div class="icon-wrapper pink">
               {{ achievement?.nextStepInfo?.emoji }}
             </div>
+            <div class="number">{{ targetFollowers }}</div>
             <p>{{ achievement?.nextStepInfo?.reward?.en }}</p>
           </div>
         </div>
@@ -416,6 +417,12 @@ onMounted(async () => {
   font-weight: 500;
 }
 
+.stage .number {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
 .progress-wrapper {
   position: relative;
 }
@@ -452,5 +459,20 @@ onMounted(async () => {
   background-color: #10b981;
   width: 0;
   transition: width 0.5s ease-in-out;
+}
+
+.animate-number {
+  animation: number-grow 2s ease-out;
+}
+
+@keyframes number-grow {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 </style>
