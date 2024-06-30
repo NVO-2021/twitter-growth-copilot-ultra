@@ -1,3 +1,5 @@
+import MountainSnow from 'lucide-vue-next/dist/esm/icons/mountain-snow.js'
+
 export function getAchievementInfo(followersCount) {
   // 假设 ACHIEVEMENT 是你提供的数据结构
   const levels = ACHIEVEMENT.levels
@@ -160,8 +162,8 @@ const ACHIEVEMENT = {
             'zh': '千粉俱乐部徽章',
             'en': '1K Club Badge',
           },
-          'emoji': '🚀',
-          'icon': 'Rocket',
+          'emoji': '🍺',
+          'icon': 'beer',
           'bgColorClass': 'bg-blue-100',
           'iconColorClass': 'text-blue-600',
           'growthTips': {
@@ -180,8 +182,8 @@ const ACHIEVEMENT = {
             'zh': '引领潮流徽章',
             'en': 'Trendsetter Badge',
           },
-          'emoji': '🌊',
-          'icon': 'Waves',
+          'emoji': '🎸',
+          'icon': 'Guitar',
           'bgColorClass': 'bg-blue-100',
           'iconColorClass': 'text-blue-600',
           'growthTips': {
@@ -253,8 +255,8 @@ const ACHIEVEMENT = {
             'zh': '影响力扩散徽章',
             'en': 'Expanding Influence Badge',
           },
-          'emoji': '🔊',
-          'icon': 'Volume2',
+          'emoji': '🎺',
+          'icon': 'ShipWheel',
           'bgColorClass': 'bg-blue-100',
           'iconColorClass': 'text-blue-600',
           'growthTips': {
@@ -274,7 +276,7 @@ const ACHIEVEMENT = {
             'en': 'Social Celebrity Badge',
           },
           'emoji': '🎭',
-          'icon': 'Drama',
+          'icon': 'Wine',
           'bgColorClass': 'bg-purple-100',
           'iconColorClass': 'text-purple-600',
           'growthTips': {
@@ -294,7 +296,7 @@ const ACHIEVEMENT = {
             'en': 'Spotlight Badge',
           },
           'emoji': '🔦',
-          'icon': 'Flashlight',
+          'icon': 'Cone',
           'bgColorClass': 'bg-yellow-100',
           'iconColorClass': 'text-yellow-600',
           'growthTips': {
@@ -313,8 +315,8 @@ const ACHIEVEMENT = {
             'zh': '思想引领徽章',
             'en': 'Thought Leader Badge',
           },
-          'emoji': '🧠',
-          'icon': 'Brain',
+          'emoji': '💡',
+          'icon': 'Lightbulb',
           'bgColorClass': 'bg-pink-100',
           'iconColorClass': 'text-pink-600',
           'growthTips': {
@@ -367,7 +369,7 @@ const ACHIEVEMENT = {
             'en': 'Influence Maestro Badge',
           },
           'emoji': '🌠',
-          'icon': 'Sticker',
+          'icon': 'Podcast',
           'bgColorClass': 'bg-blue-100',
           'iconColorClass': 'text-blue-600',
           'growthTips': {
@@ -427,7 +429,7 @@ const ACHIEVEMENT = {
             'en': '100K Milestone Badge',
           },
           'emoji': '🏆',
-          'icon': 'Trophy',
+          'icon': 'Award',
           'bgColorClass': 'bg-yellow-100',
           'iconColorClass': 'text-yellow-600',
           'growthTips': {
@@ -460,7 +462,7 @@ const ACHIEVEMENT = {
             'en': 'Unstoppable Badge',
           },
           'emoji': '💪',
-          'icon': 'Hammer',
+          'icon': 'PlaneTakeoff',
           'bgColorClass': 'bg-orange-100',
           'iconColorClass': 'text-orange-600',
           'growthTips': {
@@ -480,7 +482,7 @@ const ACHIEVEMENT = {
             'en': 'Viral Sensation Badge',
           },
           'emoji': '💎',
-          'icon': 'Diamond',
+          'icon': 'SquareActivity',
           'bgColorClass': 'bg-yellow-100',
           'iconColorClass': 'text-yellow-600',
           'growthTips': {
@@ -500,7 +502,7 @@ const ACHIEVEMENT = {
             'en': 'Influence Titan Badge',
           },
           'emoji': '🏛️',
-          'icon': 'Building2',
+          'icon': 'Ship',
           'bgColorClass': 'bg-gray-100',
           'iconColorClass': 'text-gray-600',
           'growthTips': {
@@ -520,7 +522,7 @@ const ACHIEVEMENT = {
             'en': 'Prestige Peak Badge',
           },
           'emoji': '🗻',
-          'icon': 'Mountain',
+          'icon': 'MountainSnow',
           'bgColorClass': 'bg-blue-100',
           'iconColorClass': 'text-blue-600',
           'growthTips': {
@@ -540,7 +542,7 @@ const ACHIEVEMENT = {
             'en': 'Half-Million Achievement Badge',
           },
           'emoji': '🌟',
-          'icon': 'Star',
+          'icon': 'Cake',
           'bgColorClass': 'bg-yellow-100',
           'iconColorClass': 'text-yellow-600',
           'growthTips': {
@@ -593,7 +595,7 @@ const ACHIEVEMENT = {
             'en': 'Media Darling Badge',
           },
           'emoji': '📸',
-          'icon': 'Camera',
+          'icon': 'MicVocal',
           'bgColorClass': 'bg-pink-100',
           'iconColorClass': 'text-pink-600',
           'growthTips': {
@@ -673,7 +675,7 @@ const ACHIEVEMENT = {
             'en': 'Legendary Superstar Badge',
           },
           'emoji': '🦅',
-          'icon': 'Award',
+          'icon': 'Trophy',
           'bgColorClass': 'bg-gradient-to-r from-yellow-400 to-pink-500',
           'iconColorClass': 'text-white',
           'growthTips': {

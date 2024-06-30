@@ -1,7 +1,16 @@
 <template>
-  <div class="flex flex-col h-screen bg-gradient-to-b from-blue-500 to-purple-600 text-white p-4 overflow-y-auto"
+  <div class="flex flex-col h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white p-4 overflow-y-auto"
        ref="componentRef">
-    <h1 class="text-3xl font-bold mb-1 text-center">Twitter Badge Wall</h1>
+
+
+<!--    <h1 class="text-3xl font-bold mb-1 text-center">
+      <component :is="lucideIcons['Award']" class="text-white mr-2" :size="24" />
+      Twitter Badge Wall</h1>-->
+
+    <h1 class="text-3xl font-bold mb-1 text-center items-center sm:mx-auto">
+      <component :is="lucideIcons['Award']" class="text-white mr-2 inline-block" :size="37" />
+      <span class="inline-block">Twitter Badge Wall</span>
+    </h1>
 
 
     <div class="flex-grow overflow-hidden">
@@ -20,14 +29,14 @@
         ]"
           >
             <div class="flex-shrink-0">
-            <div :class="['icon-circle', badge.bgColorClass]">
+            <div :class="['icon-circle']">
 <!--              <div :class="[badge.bgColorClass , 'rounded-full' ,'p-2']">-->
               <component
                 :is="lucideIcons[badge.icon]"
                 :size="32"
                 :class="[
             'mb-3 transition-all duration-300',
-            badge.followers <= currentFollowers ? badge.iconColorClass : 'text-gray-400'
+            badge.followers <= currentFollowers ? 'text-white' : 'text-gray-400'
           ]"
               />
             </div>
@@ -173,9 +182,7 @@ const shareToTwitter = () => {
 </script>
 
 <style scoped>
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import '/src/assets/tailwind.css';
 
 .bounce-enter-active {
   animation: bounce-in 0.5s;
