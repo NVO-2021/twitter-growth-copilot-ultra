@@ -163,7 +163,7 @@ const ACHIEVEMENT = {
             'en': '1K Club Badge',
           },
           'emoji': '🍺',
-          'icon': 'beer',
+          'icon': 'Beer',
           'bgColorClass': 'bg-blue-100',
           'iconColorClass': 'text-blue-600',
           'growthTips': {
@@ -482,7 +482,7 @@ const ACHIEVEMENT = {
             'en': 'Viral Sensation Badge',
           },
           'emoji': '💎',
-          'icon': 'SquareActivity',
+          'icon': 'Gem',
           'bgColorClass': 'bg-yellow-100',
           'iconColorClass': 'text-yellow-600',
           'growthTips': {
@@ -575,7 +575,7 @@ const ACHIEVEMENT = {
             'en': 'Stellar Radiance Badge',
           },
           'emoji': '✨',
-          'icon': 'Stars',
+          'icon': 'SunDim',
           'bgColorClass': 'bg-purple-100',
           'iconColorClass': 'text-purple-600',
           'growthTips': {
@@ -634,8 +634,8 @@ const ACHIEVEMENT = {
             'zh': '百万先驱徽章',
             'en': 'Million Pioneer Badge',
           },
-          'emoji': '🔭',
-          'icon': 'Telescope',
+          'emoji': '💰',
+          'icon': 'BadgeDollarSign',
           'bgColorClass': 'bg-indigo-100',
           'iconColorClass': 'text-indigo-600',
           'growthTips': {
