@@ -1,25 +1,98 @@
+<template>
+  <div class="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-xl shadow-lg mx-auto w-[99%] mt-3">
+    <div class="flex items-center mb-4">
+      <component :is="rocketIcon" class="text-white mr-2" :size="24" />
+      <h1 class="text-2xl font-bold text-white">Twitter Growth Copilot</h1>
+    </div>
+
+    <div class="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
+      <div class="flex justify-between items-center mb-4">
+        <div class="text-white">
+          <p class="text-sm opacity-80">Current Step</p>
+          <p class="text-xl font-bold flex items-center">
+            <Star class="mr-1" size="20" />
+            Level {{ achievement?.currentLevelInfo?.level }}: {{ achievement?.currentStepInfo?.reward?.en }}
+          </p>
+        </div>
+        <div class="text-white text-right">
+          <p class="text-sm opacity-80">Next Step</p>
+          <p class="text-xl font-bold flex items-center justify-end">
+            Level {{ achievement?.nextLevelInfo?.level }}: {{ achievement?.nextStepInfo?.reward?.en }}
+            <Star class="ml-1" size="20" />
+          </p>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <div :class="[achievement?.currentStepInfo?.bgColorClass , 'rounded-full' ,'p-2']">
+          <component :is="currentIcon" :class="achievement?.currentStepInfo?.iconColorClass" :size="32" />
+        </div>
+        <div class="text-center flex-grow mx-4">
+          <p class="text-white font-bold text-lg">{{ followsCountCache?.toLocaleString() }} /
+            {{ achievement?.nextStepInfo?.followers?.toLocaleString() }}</p>
+          <p class="text-white text-sm">Followers</p>
+        </div>
+        <div :class="[achievement?.nextStepInfo?.bgColorClass , 'rounded-full' ,'p-2']">
+          <component :is="nextIcon" :class="achievement?.nextStepInfo?.iconColorClass" :size="32" />
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <div class="flex justify-between text-white text-sm mb-1">
+          <span>{{ achievement?.currentStepInfo?.reward?.en }}</span>
+          <span>{{ achievement?.nextStepInfo?.reward?.en }}</span>
+        </div>
+        <div class="bg-white bg-opacity-30 rounded-full h-4">
+          <div
+            class="bg-gradient-to-r from-green-400 to-blue-500 h-full rounded-full"
+            :style="{ width: currentProcessView }"
+          ></div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center text-white">
+        <p class="text-sm">Progress</p>
+        <p class="font-bold">{{ currentProcessView }}</p>
+      </div>
+    </div>
+
+    <div class="mt-4 bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
+      <h2 class="text-white font-bold mb-2 flex items-center">
+        <component :is="tipsIcon" class="mr-2" size="20"  />
+        Growth Tips
+      </h2>
+      <ul class="text-white text-sm list-disc list-inside">
+        <li v-for="(tip, index) in achievement?.currentStepInfo?.growthTips?.en" :key="index">
+          {{ tip }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+
 <script setup>
 //third party
 import { computed, onMounted, ref } from 'vue'
 
 //custom
-import { getFollowersCount, observeUsername } from '../../utils/twitterUtils'
 import confetti from 'canvas-confetti'
+import { getFollowersCount, observeUsername } from '../../utils/twitterUtils'
 import { getAchievementInfo } from '/src/utils/achievement'
+import * as lucideIcons from 'lucide-vue-next'
 
-console.debug('ProfileCardUltra.vue is running', '[Vue]')
+
+const currentProcessView = ref('0.00%')
 
 
-const captureArea = ref(null)
-const screenshot = ref(null)
 let followsCountCache = 0
 let currentNumber = 0
 
+const rocketIcon = ref(lucideIcons['Rocket'])
+const tipsIcon = ref(lucideIcons['TrendingUp'])
+const currentIcon = ref(null)
+const nextIcon = ref(null)
 
-const copilot = ref({
-  name: '🚀 Twitter Growth Booster',
-  icon: 'el-icon-s-operation',
-})
+
 
 const process = computed(() => {
   let nextStepFollowers = achievement.value.nextStepInfo?.followers ?? 99999999
@@ -82,6 +155,11 @@ const freshData = async (callback) => {
   achievement.value.currentStepInfo = currentStep
   achievement.value.nextStepInfo = nextStep
 
+
+  currentIcon.value = lucideIcons[achievement.value.currentStepInfo?.icon]
+  nextIcon.value = lucideIcons[achievement.value.nextStepInfo?.icon]
+
+
   let _process = process.value
 
   console.log('current.process >>>>>>> ', _process)
@@ -89,7 +167,6 @@ const freshData = async (callback) => {
   console.debug('current.achievement >>>>>>> ', achievement)
 
   processShow(_process)
-  updateNumber(followsCountCache)
 
   // 调用函数执行操作
   updateAchievementStorage().then(changed => {
@@ -110,369 +187,126 @@ const freshData = async (callback) => {
 
 }
 
-const updateNumber = targetNumber => {
+  const processShow = (targetProgress) => {
 
-  let step = Number(targetNumber / 100) < 1 ? 1 : Number(targetNumber / 100)
-  currentNumber = achievement.value.currentStepInfo?.followers ?? -100
+    let currentProgress = 0
 
+    console.debug('processShow')
 
-  console.debug('currentNumber', currentNumber)
-  console.debug('targetNumber', targetNumber)
-  console.debug('[updateNumber] achievement.value.currentStepInfo >>>>>>>>>>>>> ', achievement.value.currentStepInfo)
+    function updateProgress() {
 
-  const startNumber = document.getElementById('startNumber')
-  console.debug('startNumber', startNumber)
+      if (currentProgress < targetProgress) {
+        currentProgress = Math.min(++currentProgress, targetProgress)
 
-  function animateNumber() {
-    if (currentNumber < targetNumber) {
-
-      currentNumber = Math.max(currentNumber += step, targetNumber)
-
-      startNumber.textContent = currentNumber?.toLocaleString()
-      requestAnimationFrame(animateNumber)
-    } else if (currentNumber === targetNumber) {
-      startNumber.classList.add('animate-number')
+        currentProcessView.value = currentProgress + '%'
+        requestAnimationFrame(updateProgress)
+      }
     }
+
+    updateProgress()
   }
-
-  animateNumber()
-
-}
-
-const processShow = (targetProgress) => {
-
-  const progress = document.querySelector('.progress')
-  const percentage = document.querySelector('.percentage')
-  let currentProgress = 0
-
-  console.debug('processShow')
-
-  function updateProgress() {
-    if (!progress || !percentage) {
-      return
-    }
-    if (currentProgress < targetProgress) {
-      currentProgress = Math.min(++currentProgress, targetProgress)
-
-      progress.style.width = currentProgress + '%'
-      percentage.textContent = currentProgress + '%'
-      requestAnimationFrame(updateProgress)
-    }
-  }
-
-  updateProgress()
-}
 
 // 使用async/await获取存储的成就数据
-const updateAchievementStorage = async () => {
+  const updateAchievementStorage = async () => {
 
-  console.debug('[updateAchievementStorage] achievement >>>>>>> ', achievement.value)
-
-  const result = await chrome.storage.sync.get(['achievement'])
-
-  console.debug('chrome.storage.sync.get([\'achievement\'])', result)
-  console.debug('result::', result.achievement)
-
-  let achievementCache = result.achievement || {} // 如果结果为空，则初始化为空对象
+    //存储followers数据
+    await chrome.storage.sync.set({ followers: followsCountCache })
 
 
-  let changed = false // 初始化数据变化标志为false
+    console.debug('[updateAchievementStorage] achievement >>>>>>> ', achievement.value)
 
-  // 检查存储的成就数据是否存在并且需要更新
-  if (!achievementCache.currentLevelInfo ||
-    !achievementCache.currentStepInfo ||
-    achievementCache.currentLevelInfo.level !== achievement.value.currentLevelInfo.level ||
-    achievementCache.currentStepInfo.step !== achievement.value.currentStepInfo.step) {
+    const result = await chrome.storage.sync.get(['achievement'])
 
-    // 数据有变化，更新storage
-    achievementCache = achievement.value // 赋予新的成就数据
-    await chrome.storage.sync.set({ achievement: achievementCache })
-    changed = true
-  } else {
-    // 数据无变化，无需操作
-  }
+    console.debug('chrome.storage.sync.get([\'achievement\'])', result)
+    console.debug('result::', result.achievement)
 
-  console.debug('Data changed:', changed)
-  return changed
-}
+    let achievementCache = result.achievement || {} // 如果结果为空，则初始化为空对象
 
 
-const showCurrentAchievement = () => {
+    let changed = false // 初始化数据变化标志为false
 
-  //撒花🎉
-  doAnimation()
+    // 检查存储的成就数据是否存在并且需要更新
+    if (!achievementCache.currentLevelInfo ||
+      !achievementCache.currentStepInfo ||
+      achievementCache.currentLevelInfo.level !== achievement.value.currentLevelInfo.level ||
+      achievementCache.currentStepInfo.step !== achievement.value.currentStepInfo.step) {
 
-  //展示徽章
-  showBadge()
-
-}
-
-
-const doAnimation = () => {
-  async function confettiAnimationAsync(endTime) {
-    const confettiFrame = async () => {
-      if (Date.now() > endTime) {
-        return
-      }
-
-      confetti({
-        particleCount: 5,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-      })
-      confetti({
-        particleCount: 5,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-      })
-
-      // 使用requestAnimationFrame进行下一帧的调度
-      requestAnimationFrame(confettiFrame)
+      // 数据有变化，更新storage
+      achievementCache = achievement.value // 赋予新的成就数据
+      await chrome.storage.sync.set({ achievement: achievementCache })
+      changed = true
+    } else {
+      // 数据无变化，无需操作
     }
 
-    // 启动动画循环
-    await confettiFrame()
+    console.debug('Data changed:', changed)
+    return changed
   }
 
-// 调用异步动画函数，传入结束时间
-  confettiAnimationAsync(Date.now() + 1 * 1000)
-    .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
 
-  setTimeout(() => {
-    // 调用异步动画函数，传入结束时间
+  const showCurrentAchievement = () => {
+
+    //撒花🎉
+    doAnimation()
+
+    //展示徽章
+    showBadge()
+
+  }
+
+
+  const doAnimation = () => {
+    async function confettiAnimationAsync(endTime) {
+      const confettiFrame = async () => {
+        if (Date.now() > endTime) {
+          return
+        }
+
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+        })
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+        })
+
+        // 使用requestAnimationFrame进行下一帧的调度
+        requestAnimationFrame(confettiFrame)
+      }
+
+      // 启动动画循环
+      await confettiFrame()
+    }
+
+// 调用异步动画函数，传入结束时间
     confettiAnimationAsync(Date.now() + 1 * 1000)
       .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
-  }, 3000)
-}
 
-const showBadge = () => {
+    setTimeout(() => {
+      // 调用异步动画函数，传入结束时间
+      confettiAnimationAsync(Date.now() + 1 * 1000)
+        .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
+    }, 3000)
+  }
 
-}
+  const showBadge = () => {
+
+  }
 
 
-onMounted(async () => {
-  // await chrome.storage.sync.set({ achievement: null })
-  await observeChanged()
-})
+  onMounted(async () => {
+    // await chrome.storage.sync.set({ achievement: null })
+    await observeChanged()
+  })
+
 
 </script>
 
-<template>
-  <div class="container">
-    <div ref="captureArea" class="twitter-growth-copilot">
-      <h2 class="title">
-        <span class="emoji">🚀</span>
-        Twitter Growth Copilot
-      </h2>
-      <div class="content">
-        <div class="stages">
-          <div class="stage">
-            <div class="icon-wrapper yellow">
-              {{ achievement?.currentStepInfo?.emoji }}
-            </div>
-            <div class="number" id="startNumber">0</div>
-            <p>{{ achievement?.currentStepInfo?.reward?.en }}</p>
-          </div>
-          <div class="stage">
-            <div class="icon-wrapper pink">
-              {{ achievement?.nextStepInfo?.emoji }}
-            </div>
-            <div class="number">{{ targetFollowers }}</div>
-            <p>{{ achievement?.nextStepInfo?.reward?.en }}</p>
-          </div>
-        </div>
-        <div class="progress-wrapper">
-          <div class="progress-label">
-            <span class="label">进度</span>
-            <span class="percentage">0%</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-
-
-.container {
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-}
-
-.twitter-growth-copilot {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  margin-top: 2rem;
-  padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  color: white;
-}
-
-.title {
-  display: flex;
-  align-items: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-}
-
-.title .emoji {
-  margin-right: 0.5rem;
-  font-size: 1.8rem;
-  animation: rocket 2s ease-in-out infinite;
-}
-
-@keyframes rocket {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-5px) rotate(5deg);
-  }
-}
-
-.content {
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-}
-
-.stages {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-}
-
-.stage {
-  text-align: center;
-}
-
-.icon-wrapper {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  margin-bottom: 0.5rem;
-  font-size: 2rem;
-  transition: transform 0.3s ease;
-  cursor: pointer;
-}
-
-.icon-wrapper:hover {
-  animation: bounce 0.6s ease infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.yellow {
-  background-color: #fde68a;
-  animation: pulse-yellow 2s infinite;
-}
-
-.pink {
-  background-color: #fbcfe8;
-  animation: pulse-pink 2s infinite;
-}
-
-@keyframes pulse-yellow {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(253, 230, 138, 0.7);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(253, 230, 138, 0);
-  }
-}
-
-@keyframes pulse-pink {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(251, 207, 232, 0.7);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(251, 207, 232, 0);
-  }
-}
-
-.stage p {
-  margin: 0.5rem 0 0;
-  font-weight: 500;
-}
-
-.stage .number {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: 0.5rem;
-}
-
-.progress-wrapper {
-  position: relative;
-}
-
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-}
-
-.label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  background-color: #10b981;
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-}
-
-.percentage {
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.progress-bar {
-  height: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.progress {
-  height: 100%;
-  background-color: #10b981;
-  width: 0;
-  transition: width 0.5s ease-in-out;
-}
-
-.animate-number {
-  animation: number-grow 2s ease-out;
-}
-
-@keyframes number-grow {
-  from {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
+@import '/src/assets/tailwind.css';
 </style>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Badge Wall</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+      @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+      }
+      .fade-in {
+          animation: fadeIn 0.3s ease-in;
+      }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-blue-500 to-purple-600 text-white">
+<div id="app" class="flex flex-col h-screen p-4 overflow-y-auto">
+  <h1 class="text-2xl font-bold mb-4 text-center">Your Twitter Badge Wall</h1>
+
+  <div id="badgeWall" class="grid grid-cols-3 gap-4 mb-6">
+    <!-- Badges will be dynamically inserted here -->
+  </div>
+
+  <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
+    <h2 class="text-xl font-semibold mb-2">Next Badge</h2>
+    <div id="nextBadge" class="flex items-center">
+      <!-- Next badge info will be inserted here -->
+    </div>
+    <div class="mt-2 bg-blue-600 rounded-full h-2">
+      <div id="progressBar" class="bg-yellow-400 h-2 rounded-full transition-all duration-500 ease-out"></div>
+    </div>
+  </div>
+
+  <button id="captureButton" class="bg-white text-purple-600 font-semibold py-2 px-4 rounded-full flex items-center justify-center hover:bg-opacity-90 transition-colors duration-300">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+    </svg>
+    Capture and Share
+  </button>
+
+  <div id="shareModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white text-gray-800 rounded-lg p-6 max-w-sm">
+      <h3 class="text-xl font-semibold mb-4">Share Your Badge Wall</h3>
+      <p class="mb-4">Your badge wall has been captured! Ready to share it on Twitter?</p>
+      <div class="flex justify-end">
+        <button id="cancelShare" class="mr-4 text-gray-600 hover:text-gray-800">
+          Cancel
+        </button>
+        <button id="shareTwitter" class="bg-blue-500 text-white py-2 px-4 rounded-full flex items-center hover:bg-blue-600 transition-colors duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+          </svg>
+          Share on Twitter
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const currentFollowers = 75000; // Example value, replace with actual follower count
+  const badges = [
+    { followers: 100, description: { en: "Century Mark" }, emoji: "🎊", iconColorClass: "text-purple-600" },
+    { followers: 1000, description: { en: "Milestone 1K" }, emoji: "🚀", iconColorClass: "text-blue-600" },
+    { followers: 10000, description: { en: "10K Milestone" }, emoji: "💫", iconColorClass: "text-indigo-600" },
+    { followers: 50000, description: { en: "50K Achievement" }, emoji: "🌟", iconColorClass: "text-yellow-600" },
+    { followers: 100000, description: { en: "100K Followers" }, emoji: "🏆", iconColorClass: "text-yellow-600" },
+    { followers: 500000, description: { en: "Half-million" }, emoji: "🌟", iconColorClass: "text-yellow-600" },
+    { followers: 1000000, description: { en: "Million milestone" }, emoji: "👑", iconColorClass: "text-blue-600" },
+    { followers: 99999999999, description: { en: "Living Legend" }, emoji: "🦅", iconColorClass: "text-white" }
+  ];
+
+  function renderBadges() {
+    const badgeWall = document.getElementById('badgeWall');
+    badgeWall.innerHTML = badges.map((badge, index) => `
+                <div class="relative flex flex-col items-center justify-center p-2 rounded-lg ${
+      badge.followers <= currentFollowers
+        ? 'bg-white bg-opacity-20 transform hover:scale-105 transition-transform duration-300'
+        : 'bg-gray-700 bg-opacity-30 filter grayscale'
+    }">
+                    <div class="text-3xl mb-2 ${badge.iconColorClass}">${badge.emoji}</div>
+                    <div class="text-xs text-center font-semibold">${badge.description.en}</div>
+                    ${badge.followers <= currentFollowers ? `
+                        <div class="absolute -top-2 -right-2 bg-green-500 rounded-full p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+  }
+
+  function getNextBadge() {
+    return badges.find(badge => badge.followers > currentFollowers) || badges[badges.length - 1];
+  }
+
+  function renderNextBadge() {
+    const nextBadge = getNextBadge();
+    const nextBadgeElement = document.getElementById('nextBadge');
+    nextBadgeElement.innerHTML = `
+                <div class="text-3xl mr-4 ${nextBadge.iconColorClass}">${nextBadge.emoji}</div>
+                <div>
+                    <div class="font-semibold">${nextBadge.description.en}</div>
+                    <div class="text-sm">${nextBadge.followers.toLocaleString()} followers</div>
+                </div>
+            `;
+
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = `${(currentFollowers / nextBadge.followers) * 100}%`;
+  }
+
+  function initializeEventListeners() {
+    const captureButton = document.getElementById('captureButton');
+    const shareModal = document.getElementById('shareModal');
+    const cancelShare = document.getElementById('cancelShare');
+    const shareTwitter = document.getElementById('shareTwitter');
+
+    captureButton.addEventListener('click', () => {
+      shareModal.classList.remove('hidden');
+      shareModal.classList.add('fade-in');
+    });
+
+    cancelShare.addEventListener('click', () => {
+      shareModal.classList.add('hidden');
+    });
+
+    shareTwitter.addEventListener('click', () => {
+      // Implement Twitter sharing logic here
+      shareModal.classList.add('hidden');
+      alert('Sharing to Twitter! (Implement actual sharing logic)');
+    });
+  }
+
+  // Initialize the page
+  renderBadges();
+  renderNextBadge();
+  initializeEventListeners();
+</script>
+</body>
+</html>
