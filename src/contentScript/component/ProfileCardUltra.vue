@@ -58,7 +58,7 @@
 
     <div class="mt-4 bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
       <h2 class="text-white font-bold mb-2 flex items-center">
-        <component :is="tipsIcon" class="mr-2" size="20"  />
+        <component :is="tipsIcon" class="mr-2" size="20" />
         Growth Tips
       </h2>
       <ul class="text-white text-sm list-disc list-inside">
@@ -91,7 +91,6 @@ const rocketIcon = ref(lucideIcons['Rocket'])
 const tipsIcon = ref(lucideIcons['TrendingUp'])
 const currentIcon = ref(null)
 const nextIcon = ref(null)
-
 
 
 const process = computed(() => {
@@ -162,7 +161,7 @@ const freshData = async (callback) => {
 
   let _process = process.value
 
-  console.log('current.process >>>>>>> ', _process)
+  console.debug('current.process >>>>>>> ', _process)
   console.debug('current.followsCountCache >>>>>>> ', followsCountCache)
   console.debug('current.achievement >>>>>>> ', achievement)
 
@@ -187,122 +186,122 @@ const freshData = async (callback) => {
 
 }
 
-  const processShow = (targetProgress) => {
+const processShow = (targetProgress) => {
 
-    let currentProgress = 0
+  let currentProgress = 0
 
-    console.debug('processShow')
+  console.debug('processShow')
 
-    function updateProgress() {
+  function updateProgress() {
 
-      if (currentProgress < targetProgress) {
-        currentProgress = Math.min(++currentProgress, targetProgress)
+    if (currentProgress < targetProgress) {
+      currentProgress = Math.min(currentProgress + 1, targetProgress)
 
-        currentProcessView.value = currentProgress + '%'
-        requestAnimationFrame(updateProgress)
-      }
+      currentProcessView.value = currentProgress + '%'
+      requestAnimationFrame(updateProgress)
     }
-
-    updateProgress()
   }
+
+  updateProgress()
+}
 
 // 使用async/await获取存储的成就数据
-  const updateAchievementStorage = async () => {
+const updateAchievementStorage = async () => {
 
-    //存储followers数据
-    await chrome.storage.sync.set({ followers: followsCountCache })
-
-
-    console.debug('[updateAchievementStorage] achievement >>>>>>> ', achievement.value)
-
-    const result = await chrome.storage.sync.get(['achievement'])
-
-    console.debug('chrome.storage.sync.get([\'achievement\'])', result)
-    console.debug('result::', result.achievement)
-
-    let achievementCache = result.achievement || {} // 如果结果为空，则初始化为空对象
+  //存储followers数据
+  await chrome.storage.sync.set({ followers: followsCountCache })
 
 
-    let changed = false // 初始化数据变化标志为false
+  console.debug('[updateAchievementStorage] achievement >>>>>>> ', achievement.value)
 
-    // 检查存储的成就数据是否存在并且需要更新
-    if (!achievementCache.currentLevelInfo ||
-      !achievementCache.currentStepInfo ||
-      achievementCache.currentLevelInfo.level !== achievement.value.currentLevelInfo.level ||
-      achievementCache.currentStepInfo.step !== achievement.value.currentStepInfo.step) {
+  const result = await chrome.storage.sync.get(['achievement'])
 
-      // 数据有变化，更新storage
-      achievementCache = achievement.value // 赋予新的成就数据
-      await chrome.storage.sync.set({ achievement: achievementCache })
-      changed = true
-    } else {
-      // 数据无变化，无需操作
-    }
+  console.debug('chrome.storage.sync.get([\'achievement\'])', result)
+  console.debug('result::', result.achievement)
 
-    console.debug('Data changed:', changed)
-    return changed
+  let achievementCache = result.achievement || {} // 如果结果为空，则初始化为空对象
+
+
+  let changed = false // 初始化数据变化标志为false
+
+  // 检查存储的成就数据是否存在并且需要更新
+  if (!achievementCache.currentLevelInfo ||
+    !achievementCache.currentStepInfo ||
+    achievementCache.currentLevelInfo.level !== achievement.value.currentLevelInfo.level ||
+    achievementCache.currentStepInfo.step !== achievement.value.currentStepInfo.step) {
+
+    // 数据有变化，更新storage
+    achievementCache = achievement.value // 赋予新的成就数据
+    await chrome.storage.sync.set({ achievement: achievementCache })
+    changed = true
+  } else {
+    // 数据无变化，无需操作
   }
 
-
-  const showCurrentAchievement = () => {
-
-    //撒花🎉
-    doAnimation()
-
-    //展示徽章
-    showBadge()
-
-  }
+  console.debug('Data changed:', changed)
+  return changed
+}
 
 
-  const doAnimation = () => {
-    async function confettiAnimationAsync(endTime) {
-      const confettiFrame = async () => {
-        if (Date.now() > endTime) {
-          return
-        }
+const showCurrentAchievement = () => {
 
-        confetti({
-          particleCount: 5,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-        })
-        confetti({
-          particleCount: 5,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-        })
+  //撒花🎉
+  doAnimation()
 
-        // 使用requestAnimationFrame进行下一帧的调度
-        requestAnimationFrame(confettiFrame)
+  //展示徽章
+  showBadge()
+
+}
+
+
+const doAnimation = () => {
+  async function confettiAnimationAsync(endTime) {
+    const confettiFrame = async () => {
+      if (Date.now() > endTime) {
+        return
       }
 
-      // 启动动画循环
-      await confettiFrame()
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+      })
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+      })
+
+      // 使用requestAnimationFrame进行下一帧的调度
+      requestAnimationFrame(confettiFrame)
     }
 
+    // 启动动画循环
+    await confettiFrame()
+  }
+
 // 调用异步动画函数，传入结束时间
+  confettiAnimationAsync(Date.now() + 1 * 1000)
+    .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
+
+  setTimeout(() => {
+    // 调用异步动画函数，传入结束时间
     confettiAnimationAsync(Date.now() + 1 * 1000)
       .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
+  }, 3000)
+}
 
-    setTimeout(() => {
-      // 调用异步动画函数，传入结束时间
-      confettiAnimationAsync(Date.now() + 1 * 1000)
-        .then(() => console.debug('Confetti animation ended.', '[TwitterUltra]'))
-    }, 3000)
-  }
+const showBadge = () => {
 
-  const showBadge = () => {
-
-  }
+}
 
 
-  onMounted(async () => {
-    // await chrome.storage.sync.set({ achievement: null })
-    await observeChanged()
-  })
+onMounted(async () => {
+  // await chrome.storage.sync.set({ achievement: null })
+  await observeChanged()
+})
 
 
 </script>

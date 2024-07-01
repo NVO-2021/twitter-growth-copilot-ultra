@@ -84,7 +84,7 @@ const freshData = async (callback) => {
 
   let _process = process.value
 
-  console.log('current.process >>>>>>> ', _process)
+  console.debug('current.process >>>>>>> ', _process)
   console.debug('current.followsCountCache >>>>>>> ', followsCountCache)
   console.debug('current.achievement >>>>>>> ', achievement)
 

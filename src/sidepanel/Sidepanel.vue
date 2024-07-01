@@ -2,19 +2,14 @@
   <div class="flex flex-col h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white p-4 overflow-y-auto"
        ref="componentRef">
 
-
-<!--    <h1 class="text-3xl font-bold mb-1 text-center">
-      <component :is="lucideIcons['Award']" class="text-white mr-2" :size="24" />
-      Twitter Badge Wall</h1>-->
-
     <h1 class="text-3xl font-bold mb-1 text-center items-center sm:mx-auto">
       <component :is="lucideIcons['Award']" class="text-white mr-2 inline-block" :size="37" />
       <span class="inline-block">Twitter Badge Wall</span>
     </h1>
 
 
-    <div class="flex-grow overflow-hidden">
-      <div class="h-full overflow-y-auto pr-4 -mr-4 pt-10">
+    <div class="flex-grow overflow-y-hidden">
+      <div class="h-full overflow-y-auto ml-4 pr-8 -mr-4 pt-4">
 
 
         <div class="grid grid-cols-3 gap-6 mb-8">
@@ -30,7 +25,6 @@
           >
             <div class="flex-shrink-0">
             <div :class="['icon-circle']">
-<!--              <div :class="[badge.bgColorClass , 'rounded-full' ,'p-2']">-->
               <component
                 :is="lucideIcons[badge.icon]"
                 :size="32"
@@ -144,7 +138,7 @@ onMounted(() => {
 })
 
 
-const observeData = (fetchData) => {
+const observeData = () => {
   let interval = setInterval(async () => {
 
     fetchData()

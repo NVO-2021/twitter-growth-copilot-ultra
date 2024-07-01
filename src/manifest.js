@@ -15,12 +15,10 @@ export default defineManifest({
     128: 'img/logo-128.png',
   },
   action: {
-    default_title: "Open Twitter Growth Sidebar",
-    // default_popup: 'popup.html',
     default_icon: 'img/logo-48.png',
+    default_popup: 'popup.html',
+    default_sidepanel: 'sidepanel.html',
   },
-  options_page: 'options.html',
-  devtools_page: 'devtools.html',
   background: {
     matches: ['http://x.com/*', 'https://x.com/*', 'http://twitter.com/*', 'https://twitter.com/*'],
     service_worker: 'src/background/index.js',
@@ -42,12 +40,15 @@ export default defineManifest({
   },
   web_accessible_resources: [
     {
-      resources: ['img/logo-16.png', 'img/logo-36.png', 'img/logo-48.png', 'img/logo-128.png'],
+      resources: [
+        'img/logo-16.png',
+        'img/logo-36.png',
+        'img/logo-48.png',
+        'img/logo-128.png',
+
+      ],
       matches: [],
     },
   ],
   permissions: ['sidePanel', 'storage', 'clipboardWrite', 'activeTab', 'tabs'],
-  // chrome_url_overrides: {
-  //   newtab: 'newtab.html',
-  // },
 })
