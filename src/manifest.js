@@ -15,9 +15,16 @@ export default defineManifest({
     128: 'img/logo-128.png',
   },
   action: {
-    default_icon: 'img/logo-48.png',
-    default_popup: 'popup.html',
-    default_sidepanel: 'sidepanel.html',
+    default_popup: "popup.html",
+    default_icon: {
+      16: 'img/logo-16.png',
+      36: 'img/logo-36.png',
+      48: 'img/logo-48.png',
+      128: 'img/logo-128.png',
+    }
+  },
+  side_panel: {
+    default_path: 'sidepanel.html',
   },
   background: {
     matches: ['http://x.com/*', 'https://x.com/*', 'http://twitter.com/*', 'https://twitter.com/*'],
@@ -35,9 +42,6 @@ export default defineManifest({
       js: ['src/contentScript/index.js'],
     },
   ],
-  side_panel: {
-    default_path: 'sidepanel.html',
-  },
   web_accessible_resources: [
     {
       resources: [
@@ -50,5 +54,5 @@ export default defineManifest({
       matches: [],
     },
   ],
-  permissions: ['sidePanel', 'storage', 'clipboardWrite', 'activeTab', 'tabs'],
+  permissions: ['sidePanel', 'storage', 'clipboardWrite', 'activeTab', 'tabs','windows'],
 })

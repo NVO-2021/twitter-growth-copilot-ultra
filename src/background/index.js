@@ -32,3 +32,27 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 })
 
+
+console.debug('Extension icon clicked')
+
+
+/*chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error))*/
+chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  if (!tab.url) return
+  console.debug('isMatchingUrl(tab.url)', isMatchingUrl(tab.url))
+  // Enables the side panel on google.com
+  if (isMatchingUrl(tab.url)) {
+    console.debug('await chrome.sidePanel.setOptions', 999)
+    chrome.sidePanel
+      .setPanelBehavior({ openPanelOnActionClick: true })
+      .catch((error) => console.error(error))
+  } else {
+    // Disables the side panel on all other sites
+    await chrome.sidePanel.setOptions({
+      tabId,
+      enabled: false,
+    })
+  }
+})
