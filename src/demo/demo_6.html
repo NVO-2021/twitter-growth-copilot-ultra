@@ -1,0 +1,212 @@
+、<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>优雅豪华演唱会互动特效</title>
+  <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap');
+
+      body {
+          margin: 0;
+          padding: 0;
+          font-family: 'Noto Serif SC', serif;
+          background-color: #000;
+          color: #fff;
+          overflow: hidden;
+      }
+      #stage {
+          width: 100vw;
+          height: 100vh;
+          position: relative;
+      }
+      .glow-text {
+          position: absolute;
+          font-size: 5rem;
+          font-weight: 700;
+          text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff;
+          animation: glow 2s ease-in-out infinite alternate;
+      }
+      @keyframes glow {
+          from { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff; }
+          to { text-shadow: 0 0 20px #ff00de, 0 0 30px #ff00de, 0 0 40px #ff00de; }
+      }
+      .emoji {
+          position: absolute;
+          font-size: 4rem;
+          animation: float 3s ease-in-out infinite;
+      }
+      @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+          100% { transform: translateY(0px); }
+      }
+      .danmaku {
+          position: absolute;
+          white-space: nowrap;
+          font-size: 2.5rem;
+          font-weight: 700;
+          animation: moveLeft 10s linear;
+      }
+      @keyframes moveLeft {
+          from { left: 100%; }
+          to { left: -100%; }
+      }
+      #controls {
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          background-color: rgba(0,0,0,0.7);
+          padding: 15px;
+          border-radius: 15px;
+      }
+      button, select {
+          padding: 12px;
+          font-size: 1.2rem;
+          font-weight: 700;
+          cursor: pointer;
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-family: 'Noto Serif SC', serif;
+      }
+      input {
+          padding: 12px;
+          font-size: 1.2rem;
+          font-weight: 700;
+          border-radius: 8px;
+          border: none;
+          font-family: 'Noto Serif SC', serif;
+      }
+      #purchaseModal {
+          display: none;
+          position: fixed;
+          z-index: 1;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0,0,0,0.7);
+      }
+      .modal-content {
+          background-color: #fefefe;
+          margin: 15% auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+          max-width: 500px;
+          border-radius: 10px;
+          color: #000;
+          font-family: 'Noto Serif SC', serif;
+          font-weight: 700;
+      }
+      /* 周杰伦特效 */
+      .jay-effect {
+          font-family: 'Noto Serif SC', serif;
+          color: #FFD700;
+          text-shadow: 0 0 10px #FFD700;
+      }
+      /* 泰勒·斯威夫特特效 */
+      .taylor-effect {
+          font-family: 'Playfair Display', serif;
+          color: #FF69B4;
+          text-shadow: 0 0 10px #FF69B4;
+      }
+  </style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="controls">
+  <input type="text" id="textInput" placeholder="输入文字">
+  <button onclick="addGlowText()">添加发光文字</button>
+  <button onclick="addEmoji()">添加Emoji</button>
+  <button onclick="addDanmaku()">发送弹幕</button>
+  <select id="effectPack" onchange="changeEffectPack()">
+    <option value="default">默认特效</option>
+    <option value="jay">周杰伦特效包</option>
+    <option value="taylor">泰勒·斯威夫特特效包</option>
+  </select>
+</div>
+
+<div id="purchaseModal">
+  <div class="modal-content">
+    <h2>购买特效包</h2>
+    <p>价格: ¥99.99</p>
+    <button onclick="completePurchase()">确认购买</button>
+    <button onclick="cancelPurchase()">取消</button>
+  </div>
+</div>
+
+<script>
+  const stage = document.getElementById('stage');
+  const textInput = document.getElementById('textInput');
+  const effectPack = document.getElementById('effectPack');
+  const purchaseModal = document.getElementById('purchaseModal');
+  let currentPack = 'default';
+
+  function addGlowText() {
+    const text = textInput.value || '演唱会';
+    const glowText = document.createElement('div');
+    glowText.className = `glow-text ${currentPack}-effect`;
+    glowText.textContent = text;
+    glowText.style.left = `${Math.random() * 70}%`;
+    glowText.style.top = `${Math.random() * 70}%`;
+    stage.appendChild(glowText);
+    setTimeout(() => stage.removeChild(glowText), 5000);
+  }
+
+  function addEmoji() {
+    const emojis = ['🎵', '🎶', '🎸', '🥁', '🎤', '👏', '❤️', '🌟', '🔥', '💃', '🕺'];
+    const emoji = document.createElement('div');
+    emoji.className = 'emoji';
+    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    emoji.style.left = `${Math.random() * 90}%`;
+    emoji.style.top = `${Math.random() * 90}%`;
+    stage.appendChild(emoji);
+    setTimeout(() => stage.removeChild(emoji), 3000);
+  }
+
+  function addDanmaku() {
+    const text = textInput.value || '精彩!';
+    const danmaku = document.createElement('div');
+    danmaku.className = `danmaku ${currentPack}-effect`;
+    danmaku.textContent = text;
+    danmaku.style.top = `${Math.random() * 80}%`;
+    stage.appendChild(danmaku);
+    setTimeout(() => stage.removeChild(danmaku), 10000);
+  }
+
+  function changeEffectPack() {
+    if (effectPack.value !== 'default' && currentPack === 'default') {
+      purchaseModal.style.display = 'block';
+    } else {
+      currentPack = effectPack.value;
+    }
+  }
+
+  function completePurchase() {
+    alert('购买成功！享受您的新特效包！');
+    currentPack = effectPack.value;
+    purchaseModal.style.display = 'none';
+  }
+
+  function cancelPurchase() {
+    effectPack.value = 'default';
+    purchaseModal.style.display = 'none';
+  }
+
+  // 自动添加一些特效
+  setInterval(addEmoji, 2000);
+  setInterval(() => {
+    if (Math.random() > 0.5) addGlowText();
+    else addDanmaku();
+  }, 3000);
+</script>
+</body>
+</html>

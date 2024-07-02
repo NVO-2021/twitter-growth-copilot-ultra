@@ -14,7 +14,7 @@
 
 
     <div class="flex-grow overflow-hidden">
-      <div class="h-full overflow-y-auto pr-4 -mr-4 pt-4">
+      <div class="h-full overflow-y-auto  pl-2 pr-6 -mr-2 pt-4">
 
 
         <div class="grid grid-cols-3 gap-6 mb-8">
