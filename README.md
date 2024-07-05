@@ -1,6 +1,21 @@
 # twitter-growth-copilot
 
+<a href="https://www.buymeacoffee.com/xiaoxianbeq"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=xiaoxianbeq&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+
 > a chrome extension tools built with Vite + Vue, and Manifest v3
+
+## introduce
+> Unlock your Twitter potential with Twitter-Growth-Copilot, the ultimate Chrome extension for savvy social media marketers and influencers!
+> 🚀 Supercharge your Twitter game:
+>> - Earn eye-catching achievement badges
+>> - Get personalized growth strategies
+>> - Enjoy a sleek, modern UI powered by Tailwind CSS
+
+## Chrome Web Store
+> [twitter-growth-copilot](https://chromewebstore.google.com/detail/twitter-growth-copilot/eiijfghjjafhjnodcgdkjgkpnlgmdgik)
+
+## Product Hunt
+> [Product Hunt](https://www.producthunt.com/posts/twitter-growth-copilot/launch-day)
 
 ## Installing
 
